@@ -67,14 +67,14 @@ interface ModalData {
 const INDEXER = 'https://mainnet-idx.4160.nodely.dev';
 
 const FEATURED_COLLECTIONS: FeaturedCollection[] = [
-  { name: 'Alchemon', address: 'OJGTHEJ2O5NXN7FVXDZZEEJTUEQHHCIYQAOC3BFBJWZJHIOEVPF6MVNCE', emoji: '\uD83D\uDC09' },
-  { name: 'Al Goanna', address: 'ALGONAUUFHPM5XBTSALSAUSJMNMM356FDIRETMJM5BPEYZGVUJHDBIUVHY', emoji: '\uD83E\uDD8E' },
-  { name: 'Thurstober', address: 'THURSTOBER54KFBKBGCXII6677MZG4XUQM4MXRAKGFK76Q2B2KAE6SIOGI', emoji: '\uD83C\uDFA8' },
-  { name: 'Headline Punks', address: 'HDL6Z2RB7OKYQRGGSO3HCB6D3SNDLABFKDNFD75YNYSAMQFML6HLWRYJMI', emoji: '\uD83D\uDC7E' },
-  { name: 'Shitty Kitties', address: 'SKITEOKT5JZPVERY72Y3PSAVPN5KAEGEPTPBCA5KULNUAADJ2YIQU7U4PU', emoji: '\uD83D\uDC31' },
-  { name: 'Yieldlings', address: 'YLDLYQSTAVH5XX7LNBRPDIVDUNKBRLPHUQQGKQ2NVTSA445SBTGUKT6GBI', emoji: '\uD83C\uDF31' },
-  { name: 'Algo Socks', address: 'SOCKSRLHCV6CTWGD6IMEDCB4WKHXE6PUXSKG5UCUMDOE2AGGSMBTPAAWQJI', emoji: '\uD83E\uDDE6' },
-  { name: 'Crescendo', address: 'C3NJUECAK3XXBHBFMO5HBFJDKBR7Y3LQV2DJRCAB7BSNKQ6QLDA3GQMXLE', emoji: '\uD83C\uDFB5' }
+  { name: 'Alchemon', address: 'OJGTHEJ2O5NXN7FVXDZZEEJTUEQHHCIYIE5MWY6BEFVVLZ2KANJODBOKGA', emoji: '\uD83D\uDC09' },
+  { name: 'Al Goanna', address: 'D5J7H7PIYKLY2U6A5OFUAC7GQHTHSXXNX65DSD3CJYPBV2MVK6NTNW44CA', emoji: '\uD83E\uDD8E' },
+  { name: 'Thurstober', address: 'GLOW7AKCAZXWQRPI6Q7OCVAO75H45AIYMTDEH3VNPETKYFXMNHAMQOVMS4', emoji: '\uD83C\uDFA8' },
+  { name: 'Algo Astros', address: 'FGDM7A6XKJCQA7WKKITF6OGTYJFM4YITZCFRIL7GQ4RDTNPET33PPJ4C2Q', emoji: '\uD83D\uDC7E' },
+  { name: 'Shitty Kitties', address: 'KPK5CEWRXZAHJLLK6ZAG5K3PGLY6ZEJREBOVVFXWYWEYGINUZY5IT3GG3I', emoji: '\uD83D\uDC31' },
+  { name: 'Yieldlings', address: '5DYIZMX7N4SAB44HLVRUGLYBPSN4UMPDZVTX7V73AIRMJQA3LKTENTLFZ4', emoji: '\uD83C\uDF31' },
+  { name: 'Algo Socks', address: 'BEF2RUDZF5CY5WXQ33M62ZX3TZQTTILSRUBR6PAWEJPKUO7GGJCTILNKOQ', emoji: '\uD83E\uDDE6' },
+  { name: 'Crescendo', address: 'H7X55NPJUIQKW3X6RWHDDS6KDKNFSM2UHE3JVVELM5TRK2PTF7WHGZHF3Q', emoji: '\uD83C\uDFB5' }
 ];
 
 const FAVORITES_KEY = 'nft-gallery-favorites';
@@ -214,7 +214,6 @@ export class NftGalleryWindowComponent extends FloatWindow {
   modalAsset = signal<NftAsset | null>(null);
   modalArc69 = signal<Arc69Metadata | null>(null);
   modalDetail = signal<AssetDetail | null>(null);
-  cache = signal<Record<string, NftAsset[]>>({});
   currentAddress = signal('');
 
   // Derived state
@@ -518,13 +517,16 @@ export class NftGalleryWindowComponent extends FloatWindow {
 
   private async fetchArc69Metadata(assetId: number): Promise<Arc69Metadata | null> {
     try {
-      const url = `${INDEXER}/v2/assets/${assetId}/transactions?tx-type=acfg&limit=1`;
+      // Indexer returns oldest-first by default; fetch all acfg txns and use the last one
+      // (most recent) which has the latest ARC-69 metadata
+      const url = `${INDEXER}/v2/assets/${assetId}/transactions?tx-type=acfg`;
       const response = await fetch(url);
       const data = await response.json();
       const txns = data?.transactions ?? [];
       if (txns.length === 0) return null;
 
-      const note = txns[0]?.note;
+      // Take the last (most recent) transaction
+      const note = txns[txns.length - 1]?.note;
       if (!note) return null;
 
       const decoded = atob(note);

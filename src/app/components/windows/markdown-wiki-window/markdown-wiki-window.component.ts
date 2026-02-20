@@ -1,6 +1,7 @@
 import {
   Component,
   ChangeDetectionStrategy,
+  ViewEncapsulation,
   signal,
   computed,
   inject,
@@ -84,7 +85,8 @@ Happy writing!
   imports: [CommonModule, FormsModule, DraggableDirective, PixelIconComponent],
   templateUrl: './markdown-wiki-window.component.html',
   styleUrls: ['./markdown-wiki-window.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None
 })
 export class MarkdownWikiWindowComponent extends FloatWindow implements OnInit, OnDestroy {
   private sanitizer = inject(DomSanitizer);

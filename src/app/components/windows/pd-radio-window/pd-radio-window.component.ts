@@ -193,7 +193,7 @@ export class PdRadioWindowComponent extends FloatWindow implements OnDestroy {
     this.cdr.markForCheck();
 
     try {
-      const url = `https://archive.org/advancedsearch.php?q=collection:audio+AND+mediatype:audio+AND+subject:${query}&fl=identifier,title,creator&rows=20&output=json&callback=`;
+      const url = `https://archive.org/advancedsearch.php?q=mediatype:audio+AND+subject:${query}&fl=identifier,title,creator&rows=20&output=json`;
       const response = await fetch(url);
       const data = await response.json();
       const docs: ArchiveItem[] = data?.response?.docs ?? [];

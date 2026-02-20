@@ -81,6 +81,7 @@ export class MorseCodeWindowComponent extends FloatWindow implements OnDestroy {
   private audioContext: AudioContext | null = null;
   private playbackTimeout: ReturnType<typeof setTimeout> | null = null;
   private scheduledTimeouts: ReturnType<typeof setTimeout>[] = [];
+  private activeOscillators: OscillatorNode[] = [];
 
   constructor() {
     super();
@@ -157,9 +158,9 @@ export class MorseCodeWindowComponent extends FloatWindow implements OnDestroy {
         this.playTone(ctx, currentTime, dashDuration / 1000);
         currentTime += dashDuration / 1000 + symbolGap / 1000;
       } else if (symbol === '/') {
-        currentTime += wordGap / 1000;
+        currentTime += (wordGap - symbolGap) / 1000;
       } else if (symbol === ' ') {
-        currentTime += letterGap / 1000;
+        currentTime += (letterGap - symbolGap) / 1000;
       }
     }
 
@@ -177,6 +178,10 @@ export class MorseCodeWindowComponent extends FloatWindow implements OnDestroy {
     }
     this.scheduledTimeouts = [];
     this.playbackTimeout = null;
+    for (const osc of this.activeOscillators) {
+      osc.stop();
+    }
+    this.activeOscillators = [];
   }
 
   private playTone(ctx: AudioContext, startTime: number, duration: number): void {
@@ -196,5 +201,13 @@ export class MorseCodeWindowComponent extends FloatWindow implements OnDestroy {
 
     oscillator.start(startTime);
     oscillator.stop(startTime + duration);
+
+    this.activeOscillators.push(oscillator);
+    oscillator.onended = () => {
+      const idx = this.activeOscillators.indexOf(oscillator);
+      if (idx !== -1) {
+        this.activeOscillators.splice(idx, 1);
+      }
+    };
   }
 }

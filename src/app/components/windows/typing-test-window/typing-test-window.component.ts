@@ -49,13 +49,16 @@ const KEYBOARD_ROWS: string[][] = [
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '(window:keydown)': 'handleKeyDown($event)',
-    '(window:keyup)': 'handleKeyUp($event)'
+    '(window:keyup)': 'handleKeyUp($event)',
+    '(click)': 'onWindowClick()',
+    '(document:mousedown)': 'onDocumentMouseDown($event)'
   }
 })
 export class TypingTestWindowComponent extends FloatWindow implements OnDestroy {
   @ViewChild('hiddenInput', { static: false }) hiddenInputRef!: ElementRef<HTMLInputElement>;
 
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly elRef = inject(ElementRef);
 
   override title = input<string>('Typing Test');
 
@@ -74,6 +77,7 @@ export class TypingTestWindowComponent extends FloatWindow implements OnDestroy 
   charStates = signal<string[]>([]);
   currentText = signal('');
   activeKey = signal('');
+  windowActive = signal(false);
 
   // Personal bests
   personalBests = signal<PersonalBests>({});
@@ -134,7 +138,20 @@ export class TypingTestWindowComponent extends FloatWindow implements OnDestroy 
     });
   }
 
+  onWindowClick(): void {
+    this.windowActive.set(true);
+  }
+
+  onDocumentMouseDown(event: MouseEvent): void {
+    if (!this.elRef.nativeElement.contains(event.target as Node)) {
+      this.windowActive.set(false);
+    }
+  }
+
   handleKeyDown(event: KeyboardEvent): void {
+    // Only process keystrokes when this window is active
+    if (!this.windowActive()) return;
+
     // Track active key for keyboard highlight
     const key = event.key.toLowerCase();
     this.activeKey.set(key);
@@ -150,6 +167,15 @@ export class TypingTestWindowComponent extends FloatWindow implements OnDestroy 
       event.preventDefault();
       if (this.currentIndex() > 0) {
         const newIndex = this.currentIndex() - 1;
+        const prevState = this.charStates()[newIndex];
+        // Undo the counters for the character being erased
+        if (prevState === 'correct') {
+          this.totalTyped.update(n => Math.max(0, n - 1));
+          this.correctTyped.update(n => Math.max(0, n - 1));
+        } else if (prevState === 'incorrect') {
+          this.totalTyped.update(n => Math.max(0, n - 1));
+          this.errors.update(n => Math.max(0, n - 1));
+        }
         this.currentIndex.set(newIndex);
         this.charStates.update(states => {
           const copy = [...states];
