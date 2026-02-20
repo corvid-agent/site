@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
-import { environment } from "../../../environments/environment.local";
+import { environment } from "../../../environments/environment";
 import { SiteSettingsMetadata } from "../../interfaces/corvid-nft.interface";
 import { SoundEffectService } from "./sound-effect.service";
 import { ThemeService } from "./theme.service";

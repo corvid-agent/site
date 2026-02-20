@@ -1,7 +1,7 @@
 import { Component, input, signal, output, ChangeDetectionStrategy, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PeraWalletConnect } from '@perawallet/connect';
-import { environment } from '../../../../environments/environment.local';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-login-overlay',

@@ -89,6 +89,25 @@
 }
 
 // ============================================
+// Section Headers
+// ============================================
+.section-header {
+  color: var(--theme-secondary-text, var(--mat-sys-on-surface-variant));
+  font-size: 0.625rem;
+  font-weight: normal;
+  font-family: var(--nes-font);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0 0 1rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--theme-border-color, var(--mat-sys-outline-variant));
+
+  &:not(:first-child) {
+    margin-top: 2rem;
+  }
+}
+
+// ============================================
 // Apps Grid (preserved from original)
 // ============================================
 .apps-grid {
@@ -121,6 +140,7 @@
 }
 
 .app-icon-btn {
+  position: relative;
   width: 80px;
   height: 80px;
   display: flex;
@@ -139,6 +159,23 @@
   font-size: 48px;
   width: 48px;
   height: 48px;
+}
+
+// ============================================
+// External Link Badge
+// ============================================
+.external-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 18px;
+  height: 18px;
+  background: var(--theme-primary-bg, var(--mat-sys-surface));
+  border: 2px solid var(--theme-border-color, var(--mat-sys-outline-variant));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--theme-secondary-text, var(--mat-sys-on-surface-variant));
 }
 
 .app-label {

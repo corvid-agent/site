@@ -12,15 +12,49 @@
 
   <!-- Scrollable Content -->
   <div class="launchpad-drawer-content">
+    <!-- Internal Apps -->
+    <h3 class="section-header">Apps</h3>
     <div class="apps-grid">
-      @for (app of apps; track app.type) {
-        <div class="app-icon" (click)="onAppClick(app.type)">
+      @for (app of apps; track app.label) {
+        <div class="app-icon" (click)="onAppClick(app)">
             <div class="app-icon-btn" [style.background-color]="app.color">
               @if (app.imgIcon) {
                 <img [src]="app.imgIcon" alt="{{ app.label }}" class="item-icon" />
               } @else {
                 <cvd-pixel-icon [name]="app.icon" size="xl" [style.color]="app.color" [style.filter]="'invert(1)'" />
               }
+            </div>
+          <span class="app-label">{{ app.label }}</span>
+        </div>
+      }
+    </div>
+
+    <!-- External Web Apps -->
+    <h3 class="section-header">Web Apps</h3>
+    <div class="apps-grid">
+      @for (app of webApps; track app.label) {
+        <div class="app-icon" (click)="onAppClick(app)">
+            <div class="app-icon-btn" [style.background-color]="app.color">
+              <cvd-pixel-icon [name]="app.icon" size="xl" [style.color]="app.color" [style.filter]="'invert(1)'" />
+              <span class="external-badge">
+                <cvd-pixel-icon name="external-link" size="sm" />
+              </span>
+            </div>
+          <span class="app-label">{{ app.label }}</span>
+        </div>
+      }
+    </div>
+
+    <!-- Infrastructure -->
+    <h3 class="section-header">Infrastructure</h3>
+    <div class="apps-grid">
+      @for (app of infraApps; track app.label) {
+        <div class="app-icon" (click)="onAppClick(app)">
+            <div class="app-icon-btn" [style.background-color]="app.color">
+              <cvd-pixel-icon [name]="app.icon" size="xl" [style.color]="app.color" [style.filter]="'invert(1)'" />
+              <span class="external-badge">
+                <cvd-pixel-icon name="external-link" size="sm" />
+              </span>
             </div>
           <span class="app-label">{{ app.label }}</span>
         </div>

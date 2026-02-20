@@ -6,7 +6,7 @@ import { PixelIconComponent } from '../../shared/pixel-icon/pixel-icon.component
 import { FloatWindow } from '../float-window/float-window.component';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../../../services/general/user.service';
-import { environment } from '../../../../environments/environment.local';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-style-guide-window',

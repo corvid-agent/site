@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input, OnInit, output, signal } from '@angular/core';
 import { PeraWalletConnect } from '@perawallet/connect';
-import { environment } from '../../../environments/environment.local';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-login-prompt',

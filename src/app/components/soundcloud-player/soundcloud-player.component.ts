@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { SoundcloudService } from '../../services/soundcloud.service';
-import { environment } from '../../../environments/environment.local';
+import { environment } from '../../../environments/environment';
 
 interface Track {
   title: string;

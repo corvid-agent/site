@@ -4,7 +4,7 @@ import algosdk from "algosdk";
 import { CID } from 'multiformats/cid';
 import * as Digest from "multiformats/hashes/digest";
 import { forkJoin, map, Observable, of } from 'rxjs';
-import { environment } from '../../environments/environment.local';
+import { environment } from '../../environments/environment';
 import { CorvidNft, SiteSettingsMetadata } from '../interfaces/corvid-nft.interface';
 import { AssetHoldings, CreatedAssetsResponse, FetchNFTsResponse } from '../interfaces/asset.interfaces';
 import { SoundEffectService } from './general/sound-effect.service';
