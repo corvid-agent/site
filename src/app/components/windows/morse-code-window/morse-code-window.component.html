@@ -1,0 +1,119 @@
+<div appDraggable [style.width.px]="width()" [style.height.px]="height()" class="float-window">
+
+  <!-- Header / Drag Handle -->
+  <div class="drag-handle" [class.cursor-grab]="!isDragging" [class.cursor-grabbing]="isDragging" (mousedown)="isDragging = true" (mouseup)="isDragging = false">
+    <label>{{ title() }}</label>
+    <button (click)="close()" class="drag-handle-close">&times;</button>
+  </div>
+
+  <!-- Main Content -->
+  <div class="morse-content">
+
+    <!-- Direction Toggle -->
+    <div class="direction-toggle">
+      <button
+        [class.active]="direction() === 'text-to-morse'"
+        (click)="setDirection('text-to-morse')">
+        Text &rarr; Morse
+      </button>
+      <button
+        [class.active]="direction() === 'morse-to-text'"
+        (click)="setDirection('morse-to-text')">
+        Morse &rarr; Text
+      </button>
+    </div>
+
+    <!-- Conversion Area -->
+    @switch (direction()) {
+      @case ('text-to-morse') {
+        <div class="conversion-area">
+          <div class="input-group">
+            <label class="field-label">Text Input</label>
+            <textarea
+              class="text-area"
+              placeholder="Type your text here..."
+              [ngModel]="textInput()"
+              (ngModelChange)="onTextInput($event)"
+              rows="5"
+            ></textarea>
+          </div>
+          <div class="input-group">
+            <div class="field-label-row">
+              <label class="field-label">Morse Output</label>
+              <button class="copy-btn" (click)="copyMorseOutput()" [disabled]="!morseOutput()">Copy</button>
+            </div>
+            <div class="output-area">{{ morseOutput() || 'Morse code will appear here...' }}</div>
+          </div>
+        </div>
+      }
+      @case ('morse-to-text') {
+        <div class="conversion-area">
+          <div class="input-group">
+            <label class="field-label">Morse Input</label>
+            <textarea
+              class="text-area morse-font"
+              placeholder="Enter morse code (use . and -, separate letters with spaces, words with /)"
+              [ngModel]="morseInput()"
+              (ngModelChange)="onMorseInput($event)"
+              rows="5"
+            ></textarea>
+          </div>
+          <div class="input-group">
+            <div class="field-label-row">
+              <label class="field-label">Text Output</label>
+              <button class="copy-btn" (click)="copyTextOutput()" [disabled]="!textOutput()">Copy</button>
+            </div>
+            <div class="output-area">{{ textOutput() || 'Decoded text will appear here...' }}</div>
+          </div>
+        </div>
+      }
+    }
+
+    <!-- Playback Controls -->
+    <div class="playback-section">
+      <div class="playback-controls">
+        @if (isPlaying()) {
+          <button class="play-btn stop" (click)="stopPlayback()">Stop</button>
+        } @else {
+          <button
+            class="play-btn"
+            (click)="playMorse()"
+            [disabled]="direction() === 'text-to-morse' ? !morseOutput() : !morseInput()">
+            Play
+          </button>
+        }
+      </div>
+
+      <div class="wpm-control">
+        <label class="field-label">Speed: {{ wpm() }} WPM</label>
+        <input
+          type="range"
+          min="5"
+          max="25"
+          step="1"
+          [ngModel]="wpm()"
+          (ngModelChange)="onWpmChange($event)"
+        />
+      </div>
+    </div>
+
+    <!-- Reference Chart Toggle -->
+    <div class="reference-section">
+      <button class="reference-toggle" (click)="toggleReference()">
+        {{ referenceOpen() ? 'Hide' : 'Show' }} Reference Chart
+      </button>
+
+      @if (referenceOpen()) {
+        <div class="reference-chart">
+          @for (entry of referenceEntries; track entry.char) {
+            <div class="reference-entry">
+              <span class="ref-char">{{ entry.char }}</span>
+              <span class="ref-code">{{ entry.code }}</span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+  </div>
+</div>

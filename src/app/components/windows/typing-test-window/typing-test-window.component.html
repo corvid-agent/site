@@ -1,0 +1,132 @@
+<div appDraggable [style.width.px]="width()" [style.height.px]="height()" class="float-window">
+
+  <!-- Header acts as the drag handle -->
+  <div class="drag-handle" [class.cursor-grab]="!isDragging" [class.cursor-grabbing]="isDragging" (mousedown)="isDragging = true" (mouseup)="isDragging = false">
+    <label>{{ title() }}</label>
+    <button (click)="close()" class="drag-handle-close">
+      &times;
+    </button>
+  </div>
+
+  <!-- Typing Test Content -->
+  <div class="typing-content" (click)="focusInput()">
+
+    <!-- Hidden input to capture keystrokes -->
+    <input
+      #hiddenInput
+      class="hidden-input"
+      type="text"
+      autocomplete="off"
+      autocorrect="off"
+      autocapitalize="off"
+      spellcheck="false"
+    />
+
+    <!-- Time Mode Selector -->
+    <div class="time-selector">
+      @for (time of timeOptions; track time) {
+        <button
+          class="time-btn"
+          [class.active]="selectedTime() === time"
+          (click)="selectTime(time)"
+        >
+          {{ time }}s
+        </button>
+      }
+      <button class="time-btn reset-btn" (click)="resetTest()">
+        <cvd-pixel-icon name="replay" />
+        Reset
+      </button>
+    </div>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+      <div class="stat">
+        <span class="stat-label">WPM</span>
+        <span class="stat-value accent">{{ wpm() }}</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Accuracy</span>
+        <span class="stat-value">{{ accuracy() }}%</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Time</span>
+        <span class="stat-value" [class.warning]="timeLeft() <= 10 && testStarted()">{{ timeLeft() }}s</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Errors</span>
+        <span class="stat-value errors">{{ errors() }}</span>
+      </div>
+    </div>
+
+    <!-- Text Display -->
+    <div class="text-display">
+      @for (char of getTextChars(); track $index) {
+        <span
+          class="char"
+          [class.dim]="getCharState($index) === 'dim'"
+          [class.correct]="getCharState($index) === 'correct'"
+          [class.incorrect]="getCharState($index) === 'incorrect'"
+          [class.current]="getCharState($index) === 'current'"
+        >{{ char }}</span>
+      }
+    </div>
+
+    <!-- Virtual Keyboard -->
+    <div class="keyboard">
+      @for (row of keyboardRows; track $index) {
+        <div class="keyboard-row">
+          @for (key of row; track key) {
+            <div
+              class="key"
+              [class.active]="isKeyActive(key)"
+            >{{ key }}</div>
+          }
+        </div>
+      }
+      <div class="keyboard-row">
+        <div class="key spacebar" [class.active]="isKeyActive(' ')">space</div>
+      </div>
+    </div>
+
+    <!-- Results Overlay -->
+    @if (testFinished()) {
+      <div class="results-overlay">
+        <div class="results-card">
+          <h2>Test Complete</h2>
+
+          <div class="results-grid">
+            <div class="result-item">
+              <span class="result-value accent">{{ wpm() }}</span>
+              <span class="result-label">WPM</span>
+            </div>
+            <div class="result-item">
+              <span class="result-value">{{ accuracy() }}%</span>
+              <span class="result-label">Accuracy</span>
+            </div>
+            <div class="result-item">
+              <span class="result-value errors">{{ errors() }}</span>
+              <span class="result-label">Errors</span>
+            </div>
+            <div class="result-item">
+              <span class="result-value">{{ correctTyped() }}</span>
+              <span class="result-label">Correct</span>
+            </div>
+          </div>
+
+          @if (getBestWpm(selectedTime()) > 0) {
+            <div class="personal-best">
+              <cvd-pixel-icon name="emoji_events" />
+              <span>Personal Best: {{ getBestWpm(selectedTime()) }} WPM ({{ getBestAccuracy(selectedTime()) }}%)</span>
+            </div>
+          }
+
+          <button class="nes-btn is-primary restart-btn" (click)="resetTest()">
+            <cvd-pixel-icon name="replay" />
+            Try Again
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</div>

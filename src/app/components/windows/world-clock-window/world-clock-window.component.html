@@ -1,0 +1,140 @@
+<div appDraggable [style.width.px]="width()" [style.height.px]="height()" class="float-window">
+
+  <!-- Header / Drag Handle -->
+  <div class="drag-handle" [class.cursor-grab]="!isDragging" [class.cursor-grabbing]="isDragging" (mousedown)="isDragging = true" (mouseup)="isDragging = false">
+    <label>{{ title() }}</label>
+    <button (click)="close()" class="drag-handle-close">&times;</button>
+  </div>
+
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <button
+      class="tab-btn"
+      [class.active]="activeTab() === 'clocks'"
+      (click)="setTab('clocks')">
+      <cvd-pixel-icon name="clock" size="sm" />
+      Clocks
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab() === 'converter'"
+      (click)="setTab('converter')">
+      <cvd-pixel-icon name="switch" size="sm" />
+      Converter
+    </button>
+  </div>
+
+  <!-- Content Area -->
+  <div class="clock-content">
+
+    @switch (activeTab()) {
+
+      <!-- Clocks Tab -->
+      @case ('clocks') {
+        <div class="clocks-tab">
+
+          <!-- Clock Grid -->
+          <div class="clock-grid">
+            @for (card of clockData(); track card.name) {
+              <div class="clock-card" [class.daytime]="card.isDaytime" [class.nighttime]="!card.isDaytime">
+                <div class="card-header">
+                  <span class="city-name">{{ card.name }}</span>
+                  <button class="remove-btn" (click)="removeCity(card.name)" title="Remove city">&times;</button>
+                </div>
+                <div class="day-night-indicator">
+                  @if (card.isDaytime) {
+                    <span class="indicator sun">&#9728;</span>
+                  } @else {
+                    <span class="indicator moon">&#127769;</span>
+                  }
+                </div>
+                <div class="digital-time">{{ card.time }}</div>
+                <div class="card-date">{{ card.date }}</div>
+                <div class="tz-abbr">{{ card.abbreviation }}</div>
+              </div>
+            }
+          </div>
+
+          <!-- Add City -->
+          <div class="add-city-section">
+            <button class="add-city-btn" (click)="toggleCityPicker()">
+              <cvd-pixel-icon name="add" size="sm" />
+              Add City
+            </button>
+
+            @if (showCityPicker()) {
+              <div class="city-picker">
+                @for (city of inactiveCities(); track city.name) {
+                  <button class="city-option" (click)="addCity(city.name)">
+                    {{ city.name }}
+                  </button>
+                } @empty {
+                  <span class="no-cities">All cities added</span>
+                }
+              </div>
+            }
+          </div>
+
+        </div>
+      }
+
+      <!-- Converter Tab -->
+      @case ('converter') {
+        <div class="converter-tab">
+
+          <div class="converter-controls">
+            <div class="control-group">
+              <label class="control-label">Source Timezone</label>
+              <select
+                class="tz-select"
+                [ngModel]="converterSourceTz()"
+                (ngModelChange)="onConverterSourceChange($event)">
+                @for (city of allCities; track city.name) {
+                  <option [value]="city.timezone">{{ city.name }} ({{ city.timezone }})</option>
+                }
+              </select>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label">Time</label>
+              <div class="time-input-row">
+                <input
+                  type="time"
+                  class="time-input"
+                  [ngModel]="converterTime()"
+                  (ngModelChange)="onConverterTimeChange($event)"
+                />
+                <button class="now-btn" (click)="setConverterToNow()">Now</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Converter Results -->
+          <div class="converter-results">
+            @for (result of converterResults(); track result.name) {
+              <div class="result-row" [class.daytime]="result.isDaytime" [class.nighttime]="!result.isDaytime">
+                <div class="result-city">
+                  <span class="result-indicator">
+                    @if (result.isDaytime) {
+                      &#9728;
+                    } @else {
+                      &#127769;
+                    }
+                  </span>
+                  {{ result.name }}
+                </div>
+                <div class="result-time">{{ result.convertedTime }}</div>
+                <div class="result-date">{{ result.convertedDate }}</div>
+              </div>
+            } @empty {
+              <div class="no-results">Set a time above to see conversions</div>
+            }
+          </div>
+
+        </div>
+      }
+
+    }
+
+  </div>
+</div>

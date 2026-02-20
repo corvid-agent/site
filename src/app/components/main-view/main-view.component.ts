@@ -16,6 +16,13 @@ import { RoadmapWindowComponent } from '../windows/roadmap-window/roadmap-window
 import { SettingsWindowComponent } from '../windows/settings-window/settings-window.component';
 import { StyleGuideWindowComponent } from '../windows/style-guide-window/style-guide-window.component';
 import { TetrisWindowComponent } from '../windows/tetris-window/tetris-window.component';
+import { MorseCodeWindowComponent } from '../windows/morse-code-window/morse-code-window.component';
+import { TypingTestWindowComponent } from '../windows/typing-test-window/typing-test-window.component';
+import { WorldClockWindowComponent } from '../windows/world-clock-window/world-clock-window.component';
+import { CodePlaygroundWindowComponent } from '../windows/code-playground-window/code-playground-window.component';
+import { PdRadioWindowComponent } from '../windows/pd-radio-window/pd-radio-window.component';
+import { MarkdownWikiWindowComponent } from '../windows/markdown-wiki-window/markdown-wiki-window.component';
+import { NftGalleryWindowComponent } from '../windows/nft-gallery-window/nft-gallery-window.component';
 import { AssetService } from '../../services/asset.service';
 
 interface DockItem {
@@ -97,6 +104,13 @@ export class MainViewComponent {
       [WindowTypes.RARITY_CHECKER]: { icon: 'star_rate', label: 'Rarity Checker' },
       [WindowTypes.ROADMAP]: { icon: 'map', label: 'Roadmap' },
       [WindowTypes.MONO]: { icon: 'work_outline', label: 'Mono', imgIcon: 'icons/mono-icon.png' },
+      [WindowTypes.MORSE_CODE]: { icon: 'radio-signal', label: 'Morse' },
+      [WindowTypes.TYPING_TEST]: { icon: 'keyboard', label: 'Typing' },
+      [WindowTypes.WORLD_CLOCK]: { icon: 'clock', label: 'Clocks' },
+      [WindowTypes.CODE_PLAYGROUND]: { icon: 'code', label: 'Code' },
+      [WindowTypes.PD_RADIO]: { icon: 'radio-on', label: 'Radio' },
+      [WindowTypes.MARKDOWN_WIKI]: { icon: 'note-multiple', label: 'Wiki' },
+      [WindowTypes.NFT_GALLERY]: { icon: 'image-frame', label: 'NFTs' },
     };
   }
 
@@ -197,6 +211,13 @@ export class MainViewComponent {
     if (componentRef.instance instanceof AboutWindowComponent) return WindowTypes.ABOUT;
     if (componentRef.instance instanceof RoadmapWindowComponent) return WindowTypes.ROADMAP;
     if (componentRef.instance instanceof MonoWindowComponent) return WindowTypes.MONO;
+    if (componentRef.instance instanceof MorseCodeWindowComponent) return WindowTypes.MORSE_CODE;
+    if (componentRef.instance instanceof TypingTestWindowComponent) return WindowTypes.TYPING_TEST;
+    if (componentRef.instance instanceof WorldClockWindowComponent) return WindowTypes.WORLD_CLOCK;
+    if (componentRef.instance instanceof CodePlaygroundWindowComponent) return WindowTypes.CODE_PLAYGROUND;
+    if (componentRef.instance instanceof PdRadioWindowComponent) return WindowTypes.PD_RADIO;
+    if (componentRef.instance instanceof MarkdownWikiWindowComponent) return WindowTypes.MARKDOWN_WIKI;
+    if (componentRef.instance instanceof NftGalleryWindowComponent) return WindowTypes.NFT_GALLERY;
     // LAUNCHPAD is now a drawer, not a window
     if (componentRef.instance instanceof StyleGuideWindowComponent) return WindowTypes.STYLE_GUIDE;
     // LOGIN is now an overlay, not a window
@@ -298,6 +319,27 @@ export class MainViewComponent {
         break;
       case WindowTypes.MONO:
         this.openOrCreateWindowAdvanced(MonoWindowComponent);
+        break;
+      case WindowTypes.MORSE_CODE:
+        this.openOrCreateWindowAdvanced(MorseCodeWindowComponent);
+        break;
+      case WindowTypes.TYPING_TEST:
+        this.openOrCreateWindowAdvanced(TypingTestWindowComponent);
+        break;
+      case WindowTypes.WORLD_CLOCK:
+        this.openOrCreateWindowAdvanced(WorldClockWindowComponent);
+        break;
+      case WindowTypes.CODE_PLAYGROUND:
+        this.openOrCreateWindowAdvanced(CodePlaygroundWindowComponent);
+        break;
+      case WindowTypes.PD_RADIO:
+        this.openOrCreateWindowAdvanced(PdRadioWindowComponent);
+        break;
+      case WindowTypes.MARKDOWN_WIKI:
+        this.openOrCreateWindowAdvanced(MarkdownWikiWindowComponent);
+        break;
+      case WindowTypes.NFT_GALLERY:
+        this.openOrCreateWindowAdvanced(NftGalleryWindowComponent);
         break;
       // case WindowTypes.SOUNDCLOUD_PLAYER:  // NOTE: Removed till a new music api is implemented
       //   this.openOrCreateWindowAdvanced<PlayerWindowComponent>(PlayerWindowComponent);

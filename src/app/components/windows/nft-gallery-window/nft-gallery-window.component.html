@@ -1,0 +1,243 @@
+<div appDraggable [style.width.px]="width()" [style.height.px]="height()" class="float-window">
+
+  <!-- Header / Drag Handle -->
+  <div class="drag-handle" [class.cursor-grab]="!isDragging" [class.cursor-grabbing]="isDragging" (mousedown)="isDragging = true" (mouseup)="isDragging = false">
+    <label>{{ title() }}</label>
+    <button (click)="close()" class="drag-handle-close">&times;</button>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-bar">
+    <div class="search-input-wrapper">
+      <cvd-pixel-icon name="search" size="sm" />
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Algorand address or asset ID..."
+        [value]="searchQuery()"
+        (input)="onSearchInput($event)"
+        (keydown)="onSearchKeydown($event)"
+      />
+      <button class="search-btn" (click)="onSearchSubmit()">Search</button>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tab-bar">
+    <button
+      class="tab-btn"
+      [class.active]="activeTab() === 'browse'"
+      (click)="switchTab('browse')">
+      Browse
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab() === 'favorites'"
+      (click)="switchTab('favorites')">
+      Favorites
+    </button>
+  </div>
+
+  <!-- Main Content -->
+  <div class="nft-content">
+
+    <!-- Browse Tab -->
+    @if (activeTab() === 'browse') {
+
+      <!-- Featured Collections (shown when no assets loaded and not loading) -->
+      @if (assets().length === 0 && !isLoading()) {
+        <div class="featured-section">
+          <h3 class="section-title">Featured Collections</h3>
+          <div class="collections-grid">
+            @for (collection of collections; track collection.address) {
+              <button class="collection-card" (click)="selectCollection(collection)">
+                <span class="collection-emoji">{{ collection.emoji }}</span>
+                <span class="collection-name">{{ collection.name }}</span>
+              </button>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- NFT Grid -->
+      @if (assets().length > 0) {
+        <div class="nft-grid">
+          @for (asset of assets(); track asset.index) {
+            <div class="nft-card" (click)="openModal(asset)">
+              <div class="nft-image-wrapper">
+                @if (asset.imageUrl) {
+                  <img [src]="asset.imageUrl" [alt]="asset.name" class="nft-image" loading="lazy" />
+                } @else {
+                  <div class="nft-placeholder">
+                    <cvd-pixel-icon name="image" size="lg" />
+                  </div>
+                }
+                <button
+                  class="favorite-btn"
+                  [class.is-favorite]="isFavorite(asset.index)"
+                  (click)="toggleFavorite($event, asset)"
+                  title="Toggle favorite">
+                  @if (isFavorite(asset.index)) {
+                    <span class="heart-icon filled">&#9829;</span>
+                  } @else {
+                    <span class="heart-icon">&#9825;</span>
+                  }
+                </button>
+              </div>
+              <div class="nft-info">
+                <span class="nft-name">{{ asset.name }}</span>
+                <span class="nft-unit">{{ asset.unitName }}</span>
+                <span class="nft-id">#{{ asset.index }}</span>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Load More -->
+        @if (nextToken()) {
+          <div class="load-more-section">
+            <button class="load-more-btn" (click)="loadMore()" [disabled]="isLoading()">
+              @if (isLoading()) {
+                <span class="spinner"></span> Loading...
+              } @else {
+                Load More
+              }
+            </button>
+          </div>
+        }
+      }
+
+      <!-- Loading Spinner (initial load) -->
+      @if (isLoading() && assets().length === 0) {
+        <div class="loading-section">
+          <span class="spinner"></span>
+          <span class="loading-text">Loading NFTs...</span>
+        </div>
+      }
+    }
+
+    <!-- Favorites Tab -->
+    @if (activeTab() === 'favorites') {
+
+      @if (isLoading()) {
+        <div class="loading-section">
+          <span class="spinner"></span>
+          <span class="loading-text">Loading favorites...</span>
+        </div>
+      }
+
+      @if (!isLoading() && !hasFavorites()) {
+        <div class="empty-state">
+          <cvd-pixel-icon name="favorite" size="xl" />
+          <p class="empty-text">No favorites yet</p>
+          <p class="empty-subtext">Browse collections and tap the heart to save NFTs here.</p>
+        </div>
+      }
+
+      @if (!isLoading() && hasFavorites()) {
+        <div class="nft-grid">
+          @for (asset of filteredAssets(); track asset.index) {
+            <div class="nft-card" (click)="openModal(asset)">
+              <div class="nft-image-wrapper">
+                @if (asset.imageUrl) {
+                  <img [src]="asset.imageUrl" [alt]="asset.name" class="nft-image" loading="lazy" />
+                } @else {
+                  <div class="nft-placeholder">
+                    <cvd-pixel-icon name="image" size="lg" />
+                  </div>
+                }
+                <button
+                  class="favorite-btn is-favorite"
+                  (click)="toggleFavorite($event, asset)"
+                  title="Remove from favorites">
+                  <span class="heart-icon filled">&#9829;</span>
+                </button>
+              </div>
+              <div class="nft-info">
+                <span class="nft-name">{{ asset.name }}</span>
+                <span class="nft-unit">{{ asset.unitName }}</span>
+                <span class="nft-id">#{{ asset.index }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    }
+
+  </div>
+
+  <!-- Detail Modal -->
+  @if (modalAsset()) {
+    <div class="modal-overlay" (click)="closeModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <span class="modal-title">{{ modalAsset()!.name }}</span>
+          <button class="modal-close" (click)="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-image-section">
+            @if (modalAsset()!.imageUrl) {
+              <img [src]="modalAsset()!.imageUrl" [alt]="modalAsset()!.name" class="modal-image" />
+            } @else {
+              <div class="modal-placeholder">
+                <cvd-pixel-icon name="image" size="xl" />
+              </div>
+            }
+          </div>
+          <div class="modal-details">
+            <div class="detail-row">
+              <span class="detail-label">Name</span>
+              <span class="detail-value">{{ modalAsset()!.name }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Unit Name</span>
+              <span class="detail-value">{{ modalAsset()!.unitName || 'N/A' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Asset ID</span>
+              <span class="detail-value">{{ modalAsset()!.index }}</span>
+            </div>
+
+            @if (modalDetail()) {
+              <div class="detail-row">
+                <span class="detail-label">Creator</span>
+                <span class="detail-value detail-address">{{ modalDetail()!.params.creator }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Total Supply</span>
+                <span class="detail-value">{{ modalDetail()!.params.total }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Decimals</span>
+                <span class="detail-value">{{ modalDetail()!.params.decimals }}</span>
+              </div>
+            }
+
+            @if (modalArc69()?.description) {
+              <div class="detail-row description-row">
+                <span class="detail-label">Description</span>
+                <span class="detail-value">{{ modalArc69()!.description }}</span>
+              </div>
+            }
+
+            <!-- Traits -->
+            @if (getTraits(modalArc69()).length > 0) {
+              <div class="traits-section">
+                <span class="detail-label">Traits</span>
+                <div class="traits-grid">
+                  @for (trait of getTraits(modalArc69()); track trait.key) {
+                    <div class="trait-card">
+                      <span class="trait-key">{{ trait.key }}</span>
+                      <span class="trait-value">{{ trait.value }}</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

@@ -1,0 +1,134 @@
+<div appDraggable [style.width.px]="width()" [style.height.px]="height()" class="float-window">
+
+  <!-- Header / Drag Handle -->
+  <div class="drag-handle" [class.cursor-grab]="!isDragging" [class.cursor-grabbing]="isDragging" (mousedown)="isDragging = true" (mouseup)="isDragging = false">
+    <label>{{ title() }}</label>
+    <button (click)="close()" class="drag-handle-close">&times;</button>
+  </div>
+
+  <!-- Main Content -->
+  <div class="radio-content">
+
+    <!-- Station Grid -->
+    @if (!currentStation()) {
+      <div class="station-grid">
+        <h3 class="station-heading">Choose a Station</h3>
+        <div class="stations">
+          @for (station of stations; track station.name) {
+            <button class="station-card" (click)="selectStation(station)">
+              <span class="station-emoji">{{ station.emoji }}</span>
+              <span class="station-name">{{ station.name }}</span>
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Player View -->
+    @if (currentStation()) {
+      <div class="player-view">
+
+        <!-- Station Selector Bar -->
+        <div class="station-bar">
+          @for (station of stations; track station.name) {
+            <button
+              class="station-tab"
+              [class.active]="station.name === currentStation()?.name"
+              (click)="selectStation(station)">
+              {{ station.emoji }} {{ station.name }}
+            </button>
+          }
+        </div>
+
+        <!-- Now Playing Card -->
+        <div class="now-playing-card">
+          <div class="now-playing-info">
+            @if (isLoading()) {
+              <span class="now-playing-title">Loading...</span>
+              <span class="now-playing-artist">Searching {{ currentStation()?.name }} archives</span>
+            } @else if (nowPlayingTitle()) {
+              <span class="now-playing-title">{{ nowPlayingTitle() }}</span>
+              <span class="now-playing-artist">{{ nowPlayingArtist() }}</span>
+            } @else {
+              <span class="now-playing-title">No Track Selected</span>
+              <span class="now-playing-artist">Pick a station to start listening</span>
+            }
+          </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-section">
+          <span class="time-label">{{ currentTimeFormatted() }}</span>
+          <div class="progress-bar" (click)="seekTo($event)">
+            <div class="progress-fill" [style.width.%]="progressPercent()"></div>
+          </div>
+          <span class="time-label">{{ durationFormatted() }}</span>
+        </div>
+
+        <!-- Player Controls -->
+        <div class="controls-section">
+          <div class="transport-controls">
+            <button class="control-btn" (click)="prevTrack()" title="Previous">
+              <cvd-pixel-icon name="skip_previous" size="md" />
+            </button>
+            <button class="control-btn play-pause-btn" (click)="togglePlayPause()" title="Play/Pause">
+              @if (isPlaying()) {
+                <cvd-pixel-icon name="pause" size="lg" />
+              } @else {
+                <cvd-pixel-icon name="play_arrow" size="lg" />
+              }
+            </button>
+            <button class="control-btn" (click)="nextTrack()" title="Next">
+              <cvd-pixel-icon name="skip_next" size="md" />
+            </button>
+          </div>
+          <div class="volume-control">
+            <cvd-pixel-icon name="volume_up" size="sm" />
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              [value]="volume()"
+              (input)="onVolumeChange($event)"
+            />
+          </div>
+        </div>
+
+        <!-- Track List -->
+        @if (tracks().length > 0) {
+          <div class="track-list">
+            <table>
+              <thead>
+                <tr>
+                  <th class="track-num">#</th>
+                  <th class="track-title">Title</th>
+                  <th class="track-duration">Duration</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (track of tracks(); track track.name; let i = $index) {
+                  <tr
+                    [class.active-track]="i === trackIndex()"
+                    (click)="selectTrack(i)">
+                    <td class="track-num">
+                      @if (i === trackIndex() && isPlaying()) {
+                        <cvd-pixel-icon name="volume_up" size="sm" />
+                      } @else {
+                        {{ i + 1 }}
+                      }
+                    </td>
+                    <td class="track-title">{{ track.title }}</td>
+                    <td class="track-duration">{{ track.length }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+      </div>
+    }
+
+  </div>
+</div>

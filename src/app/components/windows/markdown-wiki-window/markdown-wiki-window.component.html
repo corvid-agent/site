@@ -1,0 +1,152 @@
+<div appDraggable [style.width.px]="width()" [style.height.px]="height()" class="float-window">
+
+  <!-- Header / Drag Handle -->
+  <div class="drag-handle" [class.cursor-grab]="!isDragging" [class.cursor-grabbing]="isDragging" (mousedown)="isDragging = true" (mouseup)="isDragging = false">
+    <label>{{ title() }}</label>
+    <div class="header-actions">
+      <button class="header-btn" title="Toggle Sidebar" (click)="toggleSidebar()">
+        <cvd-pixel-icon name="menu" size="sm" />
+      </button>
+      <button class="header-btn" title="Save (Ctrl+S)" (click)="savePage()">
+        <cvd-pixel-icon name="save" size="sm" />
+      </button>
+      <button class="header-btn" title="Export as .md" (click)="exportPage()">
+        <cvd-pixel-icon name="launch" size="sm" />
+      </button>
+      <button (click)="close()" class="drag-handle-close">&times;</button>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="wiki-body">
+
+    <!-- Sidebar -->
+    @if (sidebarOpen()) {
+      <div class="wiki-sidebar">
+        <div class="sidebar-search">
+          <input
+            type="text"
+            placeholder="Search pages..."
+            [value]="searchFilter()"
+            (input)="searchFilter.set($any($event.target).value)"
+            class="sidebar-search-input"
+          />
+        </div>
+
+        <div class="sidebar-actions">
+          <button class="sidebar-btn" (click)="openNewPageModal()" title="New Page (Ctrl+N)">
+            <cvd-pixel-icon name="add" size="sm" />
+            <span>New</span>
+          </button>
+          <button class="sidebar-btn" (click)="openRenameModal()" title="Rename Page">
+            <cvd-pixel-icon name="edit" size="sm" />
+            <span>Rename</span>
+          </button>
+          <button class="sidebar-btn sidebar-btn-danger" (click)="deletePage()" title="Delete Page">
+            <cvd-pixel-icon name="delete" size="sm" />
+            <span>Delete</span>
+          </button>
+        </div>
+
+        <div class="sidebar-pages">
+          @for (page of filteredPages(); track page) {
+            <button
+              class="page-item"
+              [class.page-item-active]="page === currentPage()"
+              (click)="selectPage(page)"
+            >
+              <cvd-pixel-icon name="article" size="sm" />
+              <span class="page-item-name">{{ page }}</span>
+            </button>
+          } @empty {
+            <div class="sidebar-empty">No pages found</div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Editor and Preview -->
+    <div class="wiki-main">
+
+      <!-- Page Title -->
+      <div class="page-title-bar">
+        <input
+          type="text"
+          class="page-title-input"
+          [value]="currentPage()"
+          (change)="onTitleInput($event)"
+          title="Rename this page"
+        />
+      </div>
+
+      <!-- Split Pane: Editor + Preview -->
+      <div class="split-pane">
+
+        <!-- Editor Pane -->
+        <div class="editor-pane">
+          <div class="pane-label">Editor</div>
+          <textarea
+            class="wiki-editor"
+            [value]="editorContent()"
+            (input)="onEditorInput($event)"
+            placeholder="Start writing markdown..."
+            spellcheck="false"
+          ></textarea>
+        </div>
+
+        <!-- Preview Pane -->
+        <div class="preview-pane">
+          <div class="pane-label">Preview</div>
+          <div
+            class="wiki-preview"
+            [innerHTML]="renderedPreview()"
+            (click)="onPreviewClick($event)"
+          ></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Overlay -->
+  @if (modalOpen()) {
+    <div class="modal-overlay" (click)="closeModal()">
+      <div class="modal-dialog" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          @if (modalMode() === 'new') {
+            <span>New Page</span>
+          } @else {
+            <span>Rename Page</span>
+          }
+          <button class="modal-close" (click)="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <label class="modal-label">Page Name</label>
+          <input
+            type="text"
+            class="modal-input"
+            [value]="modalInput()"
+            (input)="modalInput.set($any($event.target).value)"
+            (keydown.enter)="confirmModal()"
+            autofocus
+          />
+        </div>
+        <div class="modal-footer">
+          <button class="modal-btn modal-btn-cancel" (click)="closeModal()">Cancel</button>
+          <button class="modal-btn modal-btn-confirm" (click)="confirmModal()">
+            @if (modalMode() === 'new') {
+              Create
+            } @else {
+              Rename
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Toast Notification -->
+  @if (toastVisible()) {
+    <div class="toast">{{ toastMessage() }}</div>
+  }
+</div>

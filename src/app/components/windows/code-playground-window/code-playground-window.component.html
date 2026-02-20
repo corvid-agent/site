@@ -1,0 +1,116 @@
+<div appDraggable [style.width.px]="width()" [style.height.px]="height()" class="float-window">
+
+  <!-- Header / drag handle -->
+  <div class="drag-handle" [class.cursor-grab]="!isDragging" [class.cursor-grabbing]="isDragging" (mousedown)="isDragging = true" (mouseup)="isDragging = false">
+    <label>{{ title() }}</label>
+    <button (click)="close()" class="drag-handle-close">&times;</button>
+  </div>
+
+  <!-- Main content area -->
+  <div class="playground-body">
+
+    <!-- Left panel: editors -->
+    <div class="editor-panel">
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="tab-bar">
+          <button
+            class="tab-btn"
+            [class.active]="activeTab() === 'html'"
+            (click)="setTab('html')">
+            HTML
+          </button>
+          <button
+            class="tab-btn"
+            [class.active]="activeTab() === 'css'"
+            (click)="setTab('css')">
+            CSS
+          </button>
+          <button
+            class="tab-btn"
+            [class.active]="activeTab() === 'js'"
+            (click)="setTab('js')">
+            JS
+          </button>
+        </div>
+
+        <div class="toolbar-actions">
+          <label class="auto-run-toggle">
+            <input type="checkbox" [checked]="autoRun()" (change)="toggleAutoRun()">
+            <span>Auto</span>
+          </label>
+          <button class="action-btn run-btn" (click)="runCode()">
+            <cvd-pixel-icon name="play_arrow" size="sm" />
+            Run
+          </button>
+          <button class="action-btn" (click)="resetCode()">
+            <cvd-pixel-icon name="refresh" size="sm" />
+            Reset
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab editor panes -->
+      @switch (activeTab()) {
+        @case ('html') {
+          <textarea
+            class="code-editor"
+            [value]="htmlCode()"
+            (input)="onCodeInput($event)"
+            (keydown)="onTabKeydown($event)"
+            spellcheck="false"
+            placeholder="Write HTML here...">
+          </textarea>
+        }
+        @case ('css') {
+          <textarea
+            class="code-editor"
+            [value]="cssCode()"
+            (input)="onCodeInput($event)"
+            (keydown)="onTabKeydown($event)"
+            spellcheck="false"
+            placeholder="Write CSS here...">
+          </textarea>
+        }
+        @case ('js') {
+          <textarea
+            class="code-editor"
+            [value]="jsCode()"
+            (input)="onCodeInput($event)"
+            (keydown)="onTabKeydown($event)"
+            spellcheck="false"
+            placeholder="Write JavaScript here...">
+          </textarea>
+        }
+      }
+    </div>
+
+    <!-- Right panel: preview + console -->
+    <div class="preview-panel">
+
+      <!-- Preview iframe -->
+      <div class="preview-container">
+        <iframe #previewFrame class="preview-frame" sandbox="allow-scripts" title="Preview"></iframe>
+      </div>
+
+      <!-- Console -->
+      <div class="console-panel">
+        <div class="console-header">
+          <span class="console-title">Console</span>
+          <button class="action-btn" (click)="clearConsole()">Clear</button>
+        </div>
+        <div class="console-entries">
+          @for (entry of consoleEntries(); track $index) {
+            <div class="console-entry" [class.console-log]="entry.type === 'log'" [class.console-error]="entry.type === 'error'" [class.console-warn]="entry.type === 'warn'" [class.console-info]="entry.type === 'info'">
+              <span class="console-type-badge">{{ entry.type }}</span>
+              <span class="console-text">{{ entry.text }}</span>
+            </div>
+          } @empty {
+            <div class="console-empty">Console output will appear here...</div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

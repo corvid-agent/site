@@ -73,6 +73,50 @@ export class LaunchpadWindowComponent {
       color: '#000000'
     },
 
+    // Native window apps (converted from web apps)
+    {
+      type: WindowTypes.MORSE_CODE,
+      icon: 'radio-signal',
+      label: 'Morse',
+      color: '#fcd34d'
+    },
+    {
+      type: WindowTypes.TYPING_TEST,
+      icon: 'keyboard',
+      label: 'Typing',
+      color: '#a78bfa'
+    },
+    {
+      type: WindowTypes.WORLD_CLOCK,
+      icon: 'clock',
+      label: 'Clocks',
+      color: '#38bdf8'
+    },
+    {
+      type: WindowTypes.CODE_PLAYGROUND,
+      icon: 'code',
+      label: 'Code',
+      color: '#f97316'
+    },
+    {
+      type: WindowTypes.PD_RADIO,
+      icon: 'radio-on',
+      label: 'Radio',
+      color: '#ec4899'
+    },
+    {
+      type: WindowTypes.MARKDOWN_WIKI,
+      icon: 'note-multiple',
+      label: 'Wiki',
+      color: '#14b8a6'
+    },
+    {
+      type: WindowTypes.NFT_GALLERY,
+      icon: 'image-frame',
+      label: 'NFTs',
+      color: '#c084fc'
+    },
+
     // Conditionally add Style Guide in development mode
     ...(environment.production ? [] : [{
       type: WindowTypes.STYLE_GUIDE,
@@ -93,13 +137,6 @@ export class LaunchpadWindowComponent {
     { type: WindowTypes.ABOUT, icon: 'music', label: 'Music', color: '#e879f9', url: 'https://corvid-agent.github.io/pd-music/' },
     { type: WindowTypes.ABOUT, icon: 'edit', label: 'Pixel Forge', color: '#22d3ee', url: 'https://corvid-agent.github.io/pixel-forge/' },
     { type: WindowTypes.ABOUT, icon: 'gamepad', label: 'Arcade', color: '#a3e635', url: 'https://corvid-agent.github.io/retro-arcade/' },
-    { type: WindowTypes.ABOUT, icon: 'radio-signal', label: 'Morse', color: '#fcd34d', url: 'https://corvid-agent.github.io/morse-code/' },
-    { type: WindowTypes.ABOUT, icon: 'keyboard', label: 'Typing', color: '#a78bfa', url: 'https://corvid-agent.github.io/typing-test/' },
-    { type: WindowTypes.ABOUT, icon: 'clock', label: 'Clocks', color: '#38bdf8', url: 'https://corvid-agent.github.io/world-clock/' },
-    { type: WindowTypes.ABOUT, icon: 'code', label: 'Code', color: '#f97316', url: 'https://corvid-agent.github.io/code-playground/' },
-    { type: WindowTypes.ABOUT, icon: 'radio-on', label: 'Radio', color: '#ec4899', url: 'https://corvid-agent.github.io/pd-radio/' },
-    { type: WindowTypes.ABOUT, icon: 'note-multiple', label: 'Wiki', color: '#14b8a6', url: 'https://corvid-agent.github.io/markdown-wiki/' },
-    { type: WindowTypes.ABOUT, icon: 'image-frame', label: 'NFTs', color: '#c084fc', url: 'https://corvid-agent.github.io/nft-gallery/' },
   ];
 
   infraApps: AppIcon[] = [
